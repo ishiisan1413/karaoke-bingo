@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const BINGO_SIZE = 5;
-    const MIN_NUM = 1;
+    const MIN_NUM = 70;
     const MAX_NUM = 100;
 
     const cardContainer = document.getElementById('bingo-card');
