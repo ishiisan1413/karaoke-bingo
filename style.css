@@ -5,35 +5,27 @@ body {
     align-items: center;
     background-color: #f0f8ff;
     color: #333;
-    padding: 20px 20px 50px 20px; /* 下部に余白を追加 */
+    padding: 20px 20px 50px 20px;
 }
-h1 {
-    color: #ff4500;
-    font-size: 2.5em;
-}
+h1 { color: #ff4500; font-size: 2.5em; }
 .hidden { display: none !important; }
 
 /* セットアップ画面 */
 #setup-screen {
-    background-color: white;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    width: 90%;
-    max-width: 600px;
-    text-align: center;
-    font-size: 1.2em;
+    background-color: white; padding: 30px; border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 90%; max-width: 600px;
+    text-align: center; font-size: 1.2em;
 }
-.setup-control, #player-names-container div { margin: 20px 0; }
+.setup-control, .player-input-group { margin: 20px 0; }
+.player-input-group { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px; }
 #player-names-container input, .setup-control input {
     margin-left: 10px; padding: 12px; border-radius: 6px;
     border: 1px solid #ccc; font-size: 1em;
 }
+.avatar-input { width: 60px; text-align: center; }
 
 /* ゲーム画面 */
-.controls {
-    margin: 20px 0; transform: scale(1.2); transform-origin: top center;
-}
+.controls { margin: 20px 0; transform: scale(1.2); transform-origin: top center; }
 #scoreInput {
     padding: 12px; font-size: 18px; width: 180px;
     border: 2px solid #ccc; border-radius: 8px;
@@ -56,13 +48,14 @@ button:hover { background-color: #0073e6; }
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 #called-numbers-container h3 { text-align: center; margin: 0 0 10px 0; }
-#called-numbers-list {
-    display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
-}
+#called-numbers-container h3 small { font-size: 0.6em; color: #888; }
+#called-numbers-list { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
 .called-number {
     background: #e0e0e0; border-radius: 50%; width: 40px; height: 40px;
-    display: flex; justify-content: center; align-items: center; font-weight: bold;
+    display: flex; justify-content: center; align-items: center;
+    font-weight: bold; cursor: pointer; transition: background-color 0.2s; /* ★ */
 }
+.called-number:hover { background: #ff7f7f; } /* ★ */
 
 /* プレイヤーカード */
 #players-container {
@@ -72,16 +65,26 @@ button:hover { background-color: #0073e6; }
     background: #fff; border: 3px solid #333; padding: 15px;
     border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: all 0.3s;
 }
+.player-info { text-align: center; } /* ★ */
+.player-avatar { font-size: 2em; } /* ★ */
 .player-name {
-    text-align: center; font-size: 1.5em; font-weight: bold; margin-bottom: 15px;
+    font-size: 1.5em; font-weight: bold; margin: 0 5px;
+}
+.player-title { /* ★ */
+    display: block;
+    font-size: 0.8em;
+    color: #666;
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    padding: 2px 8px;
+    margin-top: 5px;
+    min-height: 20px;
 }
 .bingo-result {
     text-align: center; font-size: 1.5em; font-weight: bold;
     color: #dc143c; margin-top: 15px; min-height: 30px;
 }
-.player-card.reach {
-    border-color: #ff4500; box-shadow: 0 0 20px #ff7f50;
-}
+.player-card.reach { border-color: #ff4500; box-shadow: 0 0 20px #ff7f50; }
 .player-name.reach::after {
     content: ' (リーチ!)'; color: #ff4500; animation: pulse 1.5s infinite;
 }
@@ -89,45 +92,32 @@ button:hover { background-color: #0073e6; }
 
 /* ビンゴカード本体 */
 .bingo-card-grid {
+    margin-top: 15px;
     display: grid; grid-template-columns: repeat(5, 65px); grid-template-rows: repeat(5, 65px); gap: 5px;
 }
 .cell {
     width: 65px; height: 65px; display: flex; align-items: center; justify-content: center;
     font-size: 1.6em; font-weight: bold; border: 1px solid #ccc;
-    background-color: #f9f9f9; transition: background-color 0.3s, transform 0.3s; cursor: pointer;
+    background-color: #f9f9f9; transition: all 0.2s; cursor: pointer;
 }
 .cell.free { background-color: #ffd700; }
-.cell.marked { background-color: #87cefa; color: white; transform: scale(1.05); }
+.cell.marked {
+    background-color: #87cefa; color: white; transform: scale(1.05);
+}
 
-/* ★ 選曲ヒント */
+/* 選曲ヒント */
 #hint-container {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border-radius: 12px;
-    padding: 20px;
-    margin: 30px 0;
-    width: 90%;
-    max-width: 500px;
-    text-align: center;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;
+    border-radius: 12px; padding: 20px; margin: 30px 0; width: 90%; max-width: 500px;
+    text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 }
-#hint-container h3 {
-    margin: 0 0 15px 0;
-    font-size: 1.3em;
-}
+#hint-container h3 { margin: 0 0 15px 0; font-size: 1.3em; }
 #hint-word {
-    font-size: 2.2em;
-    font-weight: bold;
-    min-height: 50px;
-    margin: 10px 0 20px 0;
-    animation: fadeIn 0.5s;
+    font-size: 2.2em; font-weight: bold; min-height: 50px;
+    margin: 10px 0 20px 0; animation: fadeIn 0.5s;
 }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-#new-hint-button {
-    background-color: #f0f8ff;
-    color: #764ba2;
-    font-weight: bold;
-}
+#new-hint-button { background-color: #f0f8ff; color: #764ba2; font-weight: bold; }
 
 /* モーダルウィンドウ */
 .modal {
