@@ -12,14 +12,12 @@
 
     <div id="setup-screen">
         <h2>ゲームの準備</h2>
-        
         <div class="setup-control">
             <label for="min-num">数字の範囲: </label>
             <input type="number" id="min-num" value="70">
             <span> ～ </span>
             <input type="number" id="max-num" value="99">
         </div>
-
         <div class="setup-control">
             <label for="player-count">プレイヤー数 (1〜10): </label>
             <input type="number" id="player-count" min="1" max="10" value="1">
@@ -35,12 +33,26 @@
             <button id="submitScore">入力</button>
         </div>
 
+        <div id="called-numbers-container">
+            <h3>出現済みの番号</h3>
+            <div id="called-numbers-list"></div>
+        </div>
+
         <div id="players-container">
             </div>
 
         <button id="resetButton">新しいゲームを準備する</button>
     </div>
 
+    <div id="lucky-modal" class="modal hidden">
+        <div class="modal-content">
+            <span id="close-modal-button" class="close-button">&times;</span>
+            <h2>🎉 ラッキーナンバー！ 🎉</h2>
+            <p id="lucky-message">ママのおまけチャンス！<br>好きな数字を1つ、全員のカードで開けられます！</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
