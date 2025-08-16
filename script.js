@@ -1,173 +1,192 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // 定数
     const BINGO_SIZE = 5;
-    const MIN_NUM = 70; // 70-100の範囲に設定済み
-    const MAX_NUM = 100; // 70-100の範囲に設定済み
+    const MIN_NUM = 70;
+    const MAX_NUM = 100;
 
-    const cardContainer = document.getElementById('bingo-card');
+    // DOM要素
+    const setupScreen = document.getElementById('setup-screen');
+    const gameScreen = document.getElementById('game-screen');
+    const playerCountInput = document.getElementById('player-count');
+    const setPlayersButton = document.getElementById('set-players-button');
+    const playerNamesContainer = document.getElementById('player-names-container');
+    const startGameButton = document.getElementById('start-game-button');
     const scoreInput = document.getElementById('scoreInput');
     const submitScoreButton = document.getElementById('submitScore');
+    const playersContainer = document.getElementById('players-container');
     const resetButton = document.getElementById('resetButton');
-    const resultMessage = document.getElementById('resultMessage');
 
-    let bingoCard = [];
+    // プレイヤーデータ
+    let players = [];
 
-    // 1. ビンゴカードを生成する関数
-    function generateCard() {
-        // 初期化
-        cardContainer.innerHTML = '';
-        resultMessage.textContent = '';
-        bingoCard = Array(BINGO_SIZE).fill(null).map(() => Array(BINGO_SIZE).fill({ number: 0, marked: false }));
+    // --- セットアップ関連の処理 ---
 
-        // 指定範囲の数字リストを作成
+    // プレイヤー数に応じて名前入力欄を生成
+    setPlayersButton.addEventListener('click', () => {
+        const count = parseInt(playerCountInput.value, 10);
+        if (count < 1 || count > 10) {
+            alert('プレイヤー数は1人から10人までです。');
+            return;
+        }
+        playerNamesContainer.innerHTML = '';
+        for (let i = 0; i < count; i++) {
+            const div = document.createElement('div');
+            const label = document.createElement('label');
+            label.textContent = `プレイヤー ${i + 1} の名前: `;
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'player-name-input';
+            input.value = `Player ${i + 1}`;
+            div.appendChild(label);
+            div.appendChild(input);
+            playerNamesContainer.appendChild(div);
+        }
+        startGameButton.classList.remove('hidden');
+    });
+
+    // ゲーム開始処理
+    startGameButton.addEventListener('click', () => {
+        players = [];
+        const nameInputs = document.querySelectorAll('.player-name-input');
+        nameInputs.forEach((input, index) => {
+            players.push({
+                id: index,
+                name: input.value || `Player ${index + 1}`,
+                card: generateCardData(),
+                bingoCount: 0
+            });
+        });
+
+        setupScreen.classList.add('hidden');
+        gameScreen.classList.remove('hidden');
+        renderAllPlayerCards();
+    });
+
+    // --- ゲーム中の処理 ---
+
+    // ビンゴカードのデータ構造を生成（DOM操作はしない）
+    function generateCardData() {
+        let card = Array(BINGO_SIZE).fill(null).map(() => Array(BINGO_SIZE).fill(null));
         const numbers = [];
         for (let i = MIN_NUM; i <= MAX_NUM; i++) {
             numbers.push(i);
         }
-
-        // 数字をシャッフル
         for (let i = numbers.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
         }
-        
-        // カードに数字を配置
         let numberIndex = 0;
         for (let row = 0; row < BINGO_SIZE; row++) {
             for (let col = 0; col < BINGO_SIZE; col++) {
-                const cell = document.createElement('div');
-                cell.classList.add('cell');
-
-                // 中央はFREE
                 if (row === 2 && col === 2) {
-                    cell.textContent = 'FREE';
-                    cell.classList.add('free', 'marked');
-                    bingoCard[row][col] = { number: 'FREE', marked: true };
+                    card[row][col] = { number: 'FREE', marked: true };
                 } else {
-                    const number = numbers[numberIndex++];
-                    cell.textContent = number;
-                    cell.dataset.number = number;
-                    bingoCard[row][col] = { number: number, marked: false };
-
-                    // ★ 変更点 1: 各マスにクリックイベントを追加
-                    cell.addEventListener('click', handleCellClick);
-                }
-                cardContainer.appendChild(cell);
-            }
-        }
-    }
-
-    // ★ 変更点 2: マスがクリックされたときの処理を追加
-    function handleCellClick(event) {
-        const clickedCell = event.target;
-        const number = clickedCell.dataset.number;
-
-        // すでにマークされている場合は何もしない
-        if (clickedCell.classList.contains('marked')) {
-            return;
-        }
-
-        // 対応するデータを更新
-        for (let row = 0; row < BINGO_SIZE; row++) {
-            for (let col = 0; col < BINGO_SIZE; col++) {
-                if (bingoCard[row][col].number == number) {
-                    bingoCard[row][col].marked = true;
-                    break;
+                    card[row][col] = { number: numbers[numberIndex++], marked: false };
                 }
             }
         }
-        
-        // 見た目を更新してビンゴをチェック
-        clickedCell.classList.add('marked');
-        checkBingo();
+        return card;
     }
 
-    // 2. 入力された数字をマークする関数
-    function markNumber(score) {
+    // 全プレイヤーのカードを描画
+    function renderAllPlayerCards() {
+        playersContainer.innerHTML = '';
+        players.forEach(player => {
+            const playerCardDiv = document.createElement('div');
+            playerCardDiv.className = 'player-card';
+            playerCardDiv.innerHTML = `
+                <h3 class="player-name">${player.name}</h3>
+                <div class="bingo-card-grid" id="card-${player.id}"></div>
+                <p class="bingo-result" id="result-${player.id}"></p>
+            `;
+            playersContainer.appendChild(playerCardDiv);
+
+            const grid = document.getElementById(`card-${player.id}`);
+            player.card.forEach(rowData => {
+                rowData.forEach(cellData => {
+                    const cellDiv = document.createElement('div');
+                    cellDiv.className = 'cell';
+                    cellDiv.textContent = cellData.number;
+                    if (cellData.marked) {
+                        cellDiv.classList.add('marked');
+                    }
+                    if (cellData.number === 'FREE') {
+                        cellDiv.classList.add('free');
+                    }
+                    grid.appendChild(cellDiv);
+                });
+            });
+            updateBingoStatus(player);
+        });
+    }
+
+    // 数字入力の処理
+    submitScoreButton.addEventListener('click', () => {
+        const score = parseInt(scoreInput.value, 10);
         if (!score || score < MIN_NUM || score > MAX_NUM) {
             alert(`${MIN_NUM}から${MAX_NUM}までの有効な数字を入力してください。`);
             return;
         }
-
-        let found = false;
-        for (let row = 0; row < BINGO_SIZE; row++) {
-            for (let col = 0; col < BINGO_SIZE; col++) {
-                if (bingoCard[row][col].number == score) {
-                    // すでにマークされていなければマークする
-                    if (!bingoCard[row][col].marked) {
-                        bingoCard[row][col].marked = true;
-                    }
-                    found = true;
-                    break;
-                }
-            }
-            if(found) break;
-        }
-
-        if(found) {
-            updateCardView();
-            checkBingo();
-        } else {
-            alert('その数字はカードにありません。');
-        }
+        markNumberForAllPlayers(score);
         scoreInput.value = '';
+    });
+     scoreInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            submitScoreButton.click();
+        }
+    });
+
+    // 全プレイヤーのカードで数字をマーク
+    function markNumberForAllPlayers(score) {
+        players.forEach(player => {
+            player.card.forEach(rowData => {
+                rowData.forEach(cellData => {
+                    if (cellData.number == score) {
+                        cellData.marked = true;
+                    }
+                });
+            });
+            checkBingo(player);
+        });
+        renderAllPlayerCards();
     }
 
-    // 3. カードの表示を更新する関数
-    function updateCardView() {
-        const cells = document.querySelectorAll('.cell');
-        let cellIndex = 0;
+    // 特定のプレイヤーのビンゴをチェック
+    function checkBingo(player) {
+        let count = 0;
+        const card = player.card;
+        // 横
         for (let row = 0; row < BINGO_SIZE; row++) {
-            for (let col = 0; col < BINGO_SIZE; col++) {
-                if (bingoCard[row][col].marked) {
-                    cells[cellIndex].classList.add('marked');
-                }
-                cellIndex++;
-            }
+            if (card[row].every(cell => cell.marked)) count++;
         }
-    }
-
-    // 4. ビンゴを判定する関数
-    function checkBingo() {
-        let bingoCount = 0;
-        
-        // 横列チェック
-        for (let row = 0; row < BINGO_SIZE; row++) {
-            if (bingoCard[row].every(cell => cell.marked)) {
-                bingoCount++;
-            }
-        }
-        
-        // 縦列チェック
+        // 縦
         for (let col = 0; col < BINGO_SIZE; col++) {
-            if (bingoCard.every(row => row[col].marked)) {
-                bingoCount++;
-            }
+            if (card.every(row => row[col].marked)) count++;
         }
+        // 斜め
+        if (Array.from({ length: BINGO_SIZE }, (_, i) => card[i][i]).every(cell => cell.marked)) count++;
+        if (Array.from({ length: BINGO_SIZE }, (_, i) => card[i][BINGO_SIZE - 1 - i]).every(cell => cell.marked)) count++;
         
-        // 斜めチェック (左上から右下)
-        if (Array.from({ length: BINGO_SIZE }, (_, i) => bingoCard[i][i]).every(cell => cell.marked)) {
-            bingoCount++;
-        }
-        
-        // 斜めチェック (右上から左下)
-        if (Array.from({ length: BINGO_SIZE }, (_, i) => bingoCard[i][BINGO_SIZE - 1 - i]).every(cell => cell.marked)) {
-            bingoCount++;
-        }
+        player.bingoCount = count;
+    }
 
-        if (bingoCount > 0) {
-            resultMessage.textContent = `🎉 BINGO! 🎉 (${bingoCount}ライン)`;
+    // ビンゴステータスメッセージを更新
+    function updateBingoStatus(player) {
+        const resultEl = document.getElementById(`result-${player.id}`);
+        if (player.bingoCount > 0) {
+            resultEl.textContent = `🎉 BINGO! 🎉 (${player.bingoCount}ライン)`;
+        } else {
+            resultEl.textContent = '';
         }
     }
     
-    // イベントリスナーの設定
-    submitScoreButton.addEventListener('click', () => markNumber(scoreInput.value));
-    scoreInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            markNumber(scoreInput.value);
-        }
+    // リセット処理
+    resetButton.addEventListener('click', () => {
+        gameScreen.classList.add('hidden');
+        setupScreen.classList.remove('hidden');
+        playerNamesContainer.innerHTML = '';
+        startGameButton.classList.add('hidden');
+        playerCountInput.value = '1';
     });
-    resetButton.addEventListener('click', generateCard);
 
-    // 初期カードの生成
-    generateCard();
 });
