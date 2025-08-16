@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const BINGO_SIZE = 5;
-    const MIN_NUM = 70;
-    const MAX_NUM = 100;
+    const MIN_NUM = 70; // 70-100の範囲に設定済み
+    const MAX_NUM = 100; // 70-100の範囲に設定済み
 
     const cardContainer = document.getElementById('bingo-card');
     const scoreInput = document.getElementById('scoreInput');
@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
         resultMessage.textContent = '';
         bingoCard = Array(BINGO_SIZE).fill(null).map(() => Array(BINGO_SIZE).fill({ number: 0, marked: false }));
 
-        // 1から100までの数字リストを作成
+        // 指定範囲の数字リストを作成
         const numbers = [];
         for (let i = MIN_NUM; i <= MAX_NUM; i++) {
             numbers.push(i);
@@ -47,16 +47,44 @@ document.addEventListener('DOMContentLoaded', () => {
                     cell.textContent = number;
                     cell.dataset.number = number;
                     bingoCard[row][col] = { number: number, marked: false };
+
+                    // ★ 変更点 1: 各マスにクリックイベントを追加
+                    cell.addEventListener('click', handleCellClick);
                 }
                 cardContainer.appendChild(cell);
             }
         }
     }
 
+    // ★ 変更点 2: マスがクリックされたときの処理を追加
+    function handleCellClick(event) {
+        const clickedCell = event.target;
+        const number = clickedCell.dataset.number;
+
+        // すでにマークされている場合は何もしない
+        if (clickedCell.classList.contains('marked')) {
+            return;
+        }
+
+        // 対応するデータを更新
+        for (let row = 0; row < BINGO_SIZE; row++) {
+            for (let col = 0; col < BINGO_SIZE; col++) {
+                if (bingoCard[row][col].number == number) {
+                    bingoCard[row][col].marked = true;
+                    break;
+                }
+            }
+        }
+        
+        // 見た目を更新してビンゴをチェック
+        clickedCell.classList.add('marked');
+        checkBingo();
+    }
+
     // 2. 入力された数字をマークする関数
     function markNumber(score) {
         if (!score || score < MIN_NUM || score > MAX_NUM) {
-            alert('1から100までの有効な数字を入力してください。');
+            alert(`${MIN_NUM}から${MAX_NUM}までの有効な数字を入力してください。`);
             return;
         }
 
@@ -64,7 +92,10 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let row = 0; row < BINGO_SIZE; row++) {
             for (let col = 0; col < BINGO_SIZE; col++) {
                 if (bingoCard[row][col].number == score) {
-                    bingoCard[row][col].marked = true;
+                    // すでにマークされていなければマークする
+                    if (!bingoCard[row][col].marked) {
+                        bingoCard[row][col].marked = true;
+                    }
                     found = true;
                     break;
                 }
