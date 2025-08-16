@@ -32,23 +32,20 @@
             <input type="number" id="scoreInput" placeholder="採点結果を入力">
             <button id="submitScore">入力</button>
         </div>
-
         <div id="called-numbers-container">
             <h3>出現済みの番号</h3>
             <div id="called-numbers-list"></div>
         </div>
-
-        <div id="players-container">
-            </div>
-
+        <div id="players-container"></div>
         <button id="resetButton">新しいゲームを準備する</button>
     </div>
 
-    <div id="lucky-modal" class="modal hidden">
+    <div id="modal-container" class="modal hidden">
         <div class="modal-content">
             <span id="close-modal-button" class="close-button">&times;</span>
-            <h2>🎉 ラッキーナンバー！ 🎉</h2>
-            <p id="lucky-message">ママのおまけチャンス！<br>好きな数字を1つ、全員のカードで開けられます！</p>
+            <h2 id="modal-title"></h2>
+            <p id="modal-message"></p>
+            <div id="modal-lucky-number" class="lucky-number-display"></div>
         </div>
     </div>
 
