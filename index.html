@@ -24,25 +24,21 @@
         <text x="305" y="65" font-family="Impact, sans-serif" font-size="48" fill="url(#logo-gradient)" letter-spacing="2">BINGO</text>
     </svg>
 
-
     <div id="setup-screen">
-        <h2>ゲームの準備</h2>
-        
         <div class="setup-control">
             <h4>ビンゴカードの番号</h4>
             <div class="range-input-container">
-                <input type="number" id="min-num" value="70">
+                <select id="min-num-select"></select>
                 <span>～</span>
-                <input type="number" id="max-num" value="99">
+                <select id="max-num-select"></select>
             </div>
         </div>
 
         <div class="setup-control">
             <h4>プレイヤー情報</h4>
             <div class="player-count-container">
-                <label for="player-count">人数: </label>
-                <input type="number" id="player-count" min="1" max="10" value="1">
-                <button id="set-players-button">設定</button>
+                <label for="player-count-select">人数: </label>
+                <select id="player-count-select"></select>
             </div>
             <div id="player-names-container"></div>
         </div>
