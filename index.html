@@ -8,22 +8,36 @@
 </head>
 <body>
 
-    <h1>カラオケ採点ビンゴ 🎤</h1>
+    <svg class="logo-svg" viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#8A2BE2;" />
+                <stop offset="100%" style="stop-color:#FF1493;" />
+            </linearGradient>
+        </defs>
+        <path d="M65 15 C 62 15 60 17 60 20 L 60 50 C 60 53 62 55 65 55 L 65 80 C 65 85 60 85 60 85 M65 55 C 68 55 70 53 70 50 L 70 20 C 70 17 68 15 65 15 M50 60 L 80 60 L 80 70 L 50 70 Z" fill="url(#logo-gradient)" stroke="white" stroke-width="1.5"/>
+        <text x="95" y="65" font-family="Arial, sans-serif" font-size="36" font-weight="bold" fill="url(#logo-gradient)">カラオケ採点</text>
+        <text x="295" y="65" font-family="Impact, sans-serif" font-size="48" fill="url(#logo-gradient)" letter-spacing="2">BINGO</text>
+    </svg>
 
     <div id="setup-screen">
         <h2>ゲームの準備</h2>
+        
         <div class="setup-control">
-            <label for="min-num">数字の範囲: </label>
-            <input type="number" id="min-num" value="70">
-            <span> ～ </span>
-            <input type="number" id="max-num" value="99">
+            <h4>ビンゴカードの番号</h4>
+            <div class="range-input-container">
+                <input type="number" id="min-num" value="70">
+                <span>～</span>
+                <input type="number" id="max-num" value="99">
+            </div>
         </div>
+
         <div class="setup-control">
-            <label for="player-count">プレイヤー数 (1〜10): </label>
-            <input type="number" id="player-count" min="1" max="10" value="1">
-            <button id="set-players-button">プレイヤー名を入力</button>
+            <h4>プレイヤー情報</h4>
+            <div id="player-names-container"></div>
+            <button id="set-players-button">人数を設定</button>
         </div>
-        <div id="player-names-container"></div>
+        
         <button id="start-game-button" class="hidden">ゲーム開始！</button>
     </div>
 
@@ -37,7 +51,6 @@
             <div id="called-numbers-list"></div>
         </div>
         <div id="players-container"></div>
-        
         <div id="hint-container">
             <h3>🎵 選曲お題メーカー 🎵</h3>
             <p id="hint-word">難易度を選んでね</p>
@@ -47,7 +60,6 @@
                 <button id="hard-hint-btn" class="hint-btn hard">ハード</button>
             </div>
         </div>
-        
         <button id="resetButton">新しいゲームを準備する</button>
     </div>
 
