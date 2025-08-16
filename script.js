@@ -176,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (cellData.number === 'FREE') { cellDiv.classList.add('free'); }
                     else {
                         cellDiv.dataset.playerId = player.id;
-                        cellDiv.dataset.number = cellData.number; // ★ textContentの代わりにデータ属性を使う
+                        cellDiv.dataset.number = cellData.number;
                     }
                     grid.appendChild(cellDiv);
                 });
@@ -201,11 +201,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ★ 変更点: 番号を追加する中核的な関数
     function addNumberToGame(score) {
         if (calledNumbers.includes(score)) return;
         calledNumbers.push(score);
-
         if (score === todaysLuckyNumber && !isTodaysLuckyNumberCalled) {
             isTodaysLuckyNumberCalled = true;
             showModal('おめでとうございます！', `本日のラッキーナンバー【${score}】が出ました！特別なサービスがあるかも...？`);
@@ -236,7 +234,6 @@ document.addEventListener('DOMContentLoaded', () => {
         renderAll();
     }
 
-    // ★ 変更点: 番号を削除する中核的な関数
     function removeNumberFromGame(numberToRemove) {
         calledNumbers = calledNumbers.filter(num => num !== numberToRemove);
         players.forEach(player => {
@@ -246,13 +243,10 @@ document.addEventListener('DOMContentLoaded', () => {
         renderAll();
     }
     
-    // ★ 変更点: セルクリック時の挙動を修正
     function handleCellClick(event) {
         const cell = event.target;
         if (!cell.classList.contains('cell') || cell.classList.contains('free') || !cell.dataset.number) return;
-        
         const number = parseInt(cell.dataset.number, 10);
-        
         if (calledNumbers.includes(number)) {
             removeNumberFromGame(number);
         } else {
@@ -260,7 +254,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // ★ 変更点: 出現済み番号クリック時の挙動を修正
     function handleCalledNumberClick(event) {
         const target = event.target;
         if (!target.classList.contains('called-number')) return;
@@ -274,7 +267,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const max = parseInt(scoreInput.max, 10);
         if (!score || score < min || score > max) { alert(`${min}から${max}までの有効な数字を入力してください。`); return; }
         if (calledNumbers.includes(score)) { alert('その番号は既に出ています。'); return; }
-        addNumberToGame(score); // ★ 中核関数を呼び出す
+        addNumberToGame(score);
         scoreInput.value = '';
     });
     
