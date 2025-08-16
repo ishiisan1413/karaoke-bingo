@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'YOASOBI', 'Ado', '中島みゆき', '松任谷由実', 'ジブリ', 'ディズニー',
     ];
 
-    // ★ 変更点: DOM要素の参照先をselectに変更
+    // DOM要素
     const setupScreen = document.getElementById('setup-screen');
     const gameScreen = document.getElementById('game-screen');
     const minNumSelect = document.getElementById('min-num-select');
@@ -26,7 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const playerCountSelect = document.getElementById('player-count-select');
     const playerNamesContainer = document.getElementById('player-names-container');
     const startGameButton = document.getElementById('start-game-button');
-    // (その他DOM要素は変更なし)
     const scoreInput = document.getElementById('scoreInput');
     const submitScoreButton = document.getElementById('submitScore');
     const playersContainer = document.getElementById('players-container');
@@ -41,26 +40,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const easyHintBtn = document.getElementById('easy-hint-btn');
     const normalHintBtn = document.getElementById('normal-hint-btn');
     const hardHintBtn = document.getElementById('hard-hint-btn');
-
+    const luckyNumberSpan = document.getElementById('lucky-number-span'); // ★ 変更点
 
     // (ゲームデータは変更なし)
     let players = [];
     let calledNumbers = [];
     let todaysLuckyNumber = 0;
     let isTodaysLuckyNumberCalled = false;
-
-    // ★ 新規追加: プルダウンの選択肢を生成するヘルパー関数
+    
+    // (ヘルパー関数、初期化処理などは変更なし)
     function populateSelect(selectElement, start, end, defaultValue) {
         for (let i = start; i <= end; i++) {
             const option = document.createElement('option');
-            option.value = i;
-            option.textContent = i;
+            option.value = i; option.textContent = i;
             selectElement.appendChild(option);
         }
         selectElement.value = defaultValue;
     }
-
-    // ★ 新規追加: プレイヤー名の入力欄を生成する関数
     function generatePlayerNameInputs() {
         const count = parseInt(playerCountSelect.value, 10);
         playerNamesContainer.innerHTML = '';
@@ -88,28 +84,24 @@ document.addEventListener('DOMContentLoaded', () => {
             startGameButton.classList.add('hidden');
         }
     }
-
-    // --- 初期化処理 ---
-    // ★ 変更点: ページ読み込み時にプルダウンを生成
     populateSelect(minNumSelect, 60, 100, 70);
     populateSelect(maxNumSelect, 60, 100, 99);
     populateSelect(playerCountSelect, 1, 10, 1);
-    generatePlayerNameInputs(); // 初期表示
-
-    // ★ 変更点: 人数選択プルダウンが変更されたら、自動で入力欄を再生成
+    generatePlayerNameInputs();
     playerCountSelect.addEventListener('change', generatePlayerNameInputs);
 
-    // ★ 変更点: setPlayersButtonのクリックイベントを削除
-
     startGameButton.addEventListener('click', () => {
-        const minNum = parseInt(minNumSelect.value, 10); // ★ 参照先を変更
-        const maxNum = parseInt(maxNumSelect.value, 10); // ★ 参照先を変更
+        const minNum = parseInt(minNumSelect.value, 10);
+        const maxNum = parseInt(maxNumSelect.value, 10);
         if (minNum >= maxNum) { alert('番号の範囲が正しくありません。'); return; }
         if ((maxNum - minNum + 1) < 24) { alert('ビンゴカードを作成するには、少なくとも24個のユニークな数字が必要です。'); return; }
         
         todaysLuckyNumber = generateTodaysLuckyNumber();
         isTodaysLuckyNumberCalled = false;
+        
+        luckyNumberSpan.textContent = todaysLuckyNumber; // ★ 変更点: 常時表示エリアにセット
         showModal('本日のラッキーナンバーは...', '', todaysLuckyNumber);
+        
         scoreInput.min = minNum; scoreInput.max = maxNum;
         calledNumbers = [];
         players = [];
@@ -128,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderAll();
     });
 
-    // (以下の関数は変更ありません)
+    // (以下の関数は、前回の回答から一切変更ありませんので、そのままお使いください)
     function generateTodaysLuckyNumber() {
         const today = new Date();
         const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
@@ -305,6 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
         gameScreen.classList.add('hidden'); setupScreen.classList.remove('hidden');
         playerNamesContainer.innerHTML = ''; startGameButton.classList.add('hidden');
         playerCountSelect.value = '1'; hintWord.textContent = '難易度を選んでね';
+        generatePlayerNameInputs(); // ★ 追記: リセット時も入力欄を再表示
     });
     playersContainer.addEventListener('click', handleCellClick);
     calledNumbersList.addEventListener('click', handleCalledNumberClick);
