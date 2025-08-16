@@ -1,18 +1,9 @@
 body {
     font-family: sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: #f0f8ff;
-    color: #333;
-    padding: 20px 20px 50px 20px;
+    display: flex; flex-direction: column; align-items: center;
+    background-color: #f0f8ff; color: #333; padding: 20px 20px 50px 20px;
 }
-.logo-svg {
-    width: 90%;
-    max-width: 500px; /* ★ 修正 */
-    height: auto;
-    margin-bottom: 20px;
-}
+.logo-svg { width: 90%; max-width: 500px; height: auto; margin-bottom: 20px; }
 .hidden { display: none !important; }
 
 /* セットアップ画面 */
@@ -26,35 +17,25 @@ body {
     font-size: 1.1em; color: #333; margin: 0 0 15px 0;
     border-bottom: 2px solid #eee; padding-bottom: 10px;
 }
+/* ★ 変更点: select(プルダウン)のスタイル */
 .range-input-container {
     display: flex; justify-content: center; align-items: center; gap: 15px;
 }
-.range-input-container input[type="number"] {
-    width: 100px; padding: 12px; font-size: 1.5em; text-align: center;
-    border: 2px solid #ccc; border-radius: 8px; -moz-appearance: textfield;
-}
-.range-input-container input[type="number"]::-webkit-inner-spin-button,
-.range-input-container input[type="number"]::-webkit-outer-spin-button {
-    -webkit-appearance: none; margin: 0;
+.range-input-container select {
+    width: 120px; padding: 12px; font-size: 1.5em; text-align: center;
+    border: 2px solid #ccc; border-radius: 8px;
+    background-color: white;
 }
 .range-input-container span { font-size: 1.5em; font-weight: bold; color: #555; }
 
-/* ★ 修正: プレイヤー人数入力欄のスタイル */
 .player-count-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 20px;
+    display: flex; justify-content: center; align-items: center;
+    gap: 10px; margin-bottom: 20px;
 }
-.player-count-container input[type="number"] {
-    width: 80px;
-    padding: 10px;
-    font-size: 1.2em;
-    text-align: center;
-}
-#set-players-button {
-    font-size: 1em !important; padding: 10px 20px !important; margin: 0;
+.player-count-container label { font-size: 1.2em; }
+.player-count-container select {
+    width: 100px; padding: 10px; font-size: 1.2em; text-align: center;
+    border: 2px solid #ccc; border-radius: 8px; background-color: white;
 }
 
 .player-input-group {
@@ -64,9 +45,7 @@ body {
 #player-names-container input {
     padding: 12px; border-radius: 6px; border: 1px solid #ccc; font-size: 1em;
 }
-.avatar-input {
-    width: 60px; text-align: center; font-size: 1.2em; padding: 8px !important;
-}
+.avatar-input { width: 60px; text-align: center; font-size: 1.2em; padding: 8px !important; }
 
 /* ゲーム画面 (以下、変更なし) */
 .controls { margin: 20px 0; transform: scale(1.2); transform-origin: top center; }
@@ -159,8 +138,4 @@ button:hover { background-color: #0073e6; }
     font-size: 4em; font-weight: bold; color: #ff4500; margin: 20px 0;
     animation: bounce 1s;
 }
-@keyframes bounce {
-    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-    40% { transform: translateY(-30px); }
-    60% { transform: translateY(-15px); }
-}
+@keyframes bounce { 0% { opacity: 1; } 20% { opacity: 0; } 40% { opacity: 1; } 60% { opacity: 0; } 80% { opacity: 1; } 100% { opacity: 1; } }
