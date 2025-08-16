@@ -1,12 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
     // 定数
     const BINGO_SIZE = 5;
-    const MIN_NUM = 70;
-    const MAX_NUM = 100;
 
     // DOM要素
     const setupScreen = document.getElementById('setup-screen');
     const gameScreen = document.getElementById('game-screen');
+    const minNumInput = document.getElementById('min-num'); // ★ 変更点
+    const maxNumInput = document.getElementById('max-num'); // ★ 変更点
     const playerCountInput = document.getElementById('player-count');
     const setPlayersButton = document.getElementById('set-players-button');
     const playerNamesContainer = document.getElementById('player-names-container');
@@ -46,13 +46,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ゲーム開始処理
     startGameButton.addEventListener('click', () => {
+        // ★ 変更点: HTMLから範囲を取得
+        const minNum = parseInt(minNumInput.value, 10);
+        const maxNum = parseInt(maxNumInput.value, 10);
+
+        // ★ 変更点: 範囲の妥当性チェック
+        if (isNaN(minNum) || isNaN(maxNum) || minNum >= maxNum) {
+            alert('有効な数字の範囲を入力してください。');
+            return;
+        }
+        if ((maxNum - minNum + 1) < 24) {
+            alert('ビンゴカードを作成するには、少なくとも24個のユニークな数字が必要です。範囲を広げてください。');
+            return;
+        }
+        
+        // ゲーム画面の入力欄に範囲を設定
+        scoreInput.min = minNum;
+        scoreInput.max = maxNum;
+
         players = [];
         const nameInputs = document.querySelectorAll('.player-name-input');
         nameInputs.forEach((input, index) => {
             players.push({
                 id: index,
                 name: input.value || `Player ${index + 1}`,
-                card: generateCardData(),
+                card: generateCardData(minNum, maxNum), // ★ 変更点
                 bingoCount: 0
             });
         });
@@ -65,10 +83,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- ゲーム中の処理 ---
 
     // ビンゴカードのデータ構造を生成（DOM操作はしない）
-    function generateCardData() {
+    function generateCardData(min, max) { // ★ 変更点: 引数を受け取る
         let card = Array(BINGO_SIZE).fill(null).map(() => Array(BINGO_SIZE).fill(null));
         const numbers = [];
-        for (let i = MIN_NUM; i <= MAX_NUM; i++) {
+        for (let i = min; i <= max; i++) { // ★ 変更点
             numbers.push(i);
         }
         for (let i = numbers.length - 1; i > 0; i--) {
@@ -123,8 +141,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // 数字入力の処理
     submitScoreButton.addEventListener('click', () => {
         const score = parseInt(scoreInput.value, 10);
-        if (!score || score < MIN_NUM || score > MAX_NUM) {
-            alert(`${MIN_NUM}から${MAX_NUM}までの有効な数字を入力してください。`);
+        // ★ 変更点: 動的に設定された範囲でバリデーション
+        const min = parseInt(scoreInput.min, 10);
+        const max = parseInt(scoreInput.max, 10);
+        if (!score || score < min || score > max) {
+            alert(`${min}から${max}までの有効な数字を入力してください。`);
             return;
         }
         markNumberForAllPlayers(score);
@@ -188,5 +209,4 @@ document.addEventListener('DOMContentLoaded', () => {
         startGameButton.classList.add('hidden');
         playerCountInput.value = '1';
     });
-
 });
