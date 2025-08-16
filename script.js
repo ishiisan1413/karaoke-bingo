@@ -1,13 +1,18 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // (定数リストは変更ありません)
     const BINGO_SIZE = 5;
     const OTHER_LUCKY_NUMBERS = [77, 88, 99];
     const AVATARS = [
+        // 飲み物系
         '🍺', '🍻', '🍷', '🥂', '🥃', '🍶', '🍸', '🍹', '🍋', '🍾', '🍵',
+        // 食べ物系
         '🍙', '🍜', '🍢', '🍗', '🍟', '🥜', '🦑', '🐠', '🥗', '🫘', '🍖',
+        // 王族・貴族系
         '👑', '🤴', '👸', '🎩', '🧐', '🏰',
+        // 戦士・武人系
         '⚔️', '🛡️', '🏯', '🏹', '🥷', '👺', '👹', '🦸', '💪',
+        // 達人・師匠系
         '🎓', '📜', '🎨', '⚓', '🥋', '✨',
+        // 人物・キャラクター系
         '😎', '🥸', '👴', '👵', '👨', '👩', '🤠', '👻', '🤖', '👽'
     ];
     const NAME_NOUNS = [
@@ -48,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'デビュー曲が大ヒット', '解散したグループ'
     ];
 
-    // (DOM要素の定義は変更ありません)
+    // DOM要素
     const setupScreen = document.getElementById('setup-screen');
     const gameScreen = document.getElementById('game-screen');
     const minNumSelect = document.getElementById('min-num-select');
@@ -77,53 +82,51 @@ document.addEventListener('DOMContentLoaded', () => {
     let todaysLuckyNumber = 0;
     let isTodaysLuckyNumberCalled = false;
 
-    // (ランダム生成、初期化処理は変更ありません)
-    function getRandomItem(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-    function setRandomPlayerInfo(groupDiv) { /* ... */ }
-    function populateSelectWithOptions(selectElement, optionsArray, defaultValue) { /* ... */ }
-    function populateSelectWithNumbers(selectElement, start, end, defaultValue) { /* ... */ }
-    function generatePlayerNameInputs() { /* ... */ }
-    // (上記の省略部分は、前回のコードからコピーしてください)
-
-    // ★ 変更点: textContent を innerHTML に変更
-    function displayHint(htmlContent) {
-        hintWord.innerHTML = htmlContent;
-        hintWord.classList.remove('fadeIn');
-        void hintWord.offsetWidth;
-        hintWord.classList.add('fadeIn');
+    // --- ランダム生成 ---
+    function getRandomItem(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
     }
-    easyHintBtn.addEventListener('click', () => displayHint(getRandomItem(HINT_THEMES)));
-    
-    // ★ 変更点: NormalとHardの表示形式を変更
-    normalHintBtn.addEventListener('click', () => {
-        let hint1 = getRandomItem(HINT_THEMES);
-        let hint2;
-        do { hint2 = getRandomItem(HINT_SPECIFICS); } while (hint1 === hint2);
-        displayHint(`${hint1}<span class="hint-separator">×</span>${hint2}`);
-    });
-    hardHintBtn.addEventListener('click', () => {
-        let hint1 = getRandomItem(HINT_SPECIFICS);
-        let hint2;
-        do { hint2 = getRandomItem(HINT_SPECIFICS); } while (hint1 === hint2);
-        displayHint(`${hint1}<span class="hint-separator">×</span>${hint2}`);
-    });
-    
-    // (以下のゲームロジック、描画関数、イベントリスナーなどは一切変更ありません)
-    
-    // 省略した関数の完全なコード (前回の回答と同じものです)
+
     function setRandomPlayerInfo(groupDiv) {
         const avatarSelect1 = groupDiv.querySelector('.avatar-select-1');
         const avatarSelect2 = groupDiv.querySelector('.avatar-select-2');
         const nameInput = groupDiv.querySelector('.player-name-input');
+        
         const noun = getRandomItem(NAME_NOUNS);
         const suffix = getRandomItem(NAME_SUFFIXES);
         nameInput.value = `${noun}${suffix}`;
+        
         let randomAvatar1 = getRandomItem(AVATARS);
         let randomAvatar2;
-        do { randomAvatar2 = getRandomItem(AVATARS); } while (randomAvatar1 === randomAvatar2);
+        do {
+            randomAvatar2 = getRandomItem(AVATARS);
+        } while (randomAvatar1 === randomAvatar2);
+
         avatarSelect1.value = randomAvatar1;
         avatarSelect2.value = randomAvatar2;
     }
+
+    // --- 初期化処理 ---
+    // ★ 修正点: プルダウン生成用の関数定義を修正
+    function populateSelectWithOptions(selectElement, optionsArray, defaultValue) {
+        optionsArray.forEach(opt => {
+            const option = document.createElement('option');
+            option.value = opt;
+            option.textContent = opt;
+            selectElement.appendChild(option);
+        });
+        if (defaultValue) selectElement.value = defaultValue;
+    }
+    function populateSelectWithNumbers(selectElement, start, end, defaultValue) {
+        for (let i = start; i <= end; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = i;
+            selectElement.appendChild(option);
+        }
+        if (defaultValue) selectElement.value = defaultValue;
+    }
+
     function generatePlayerNameInputs() {
         const count = parseInt(playerCountSelect.value, 10);
         playerNamesContainer.innerHTML = '';
@@ -131,22 +134,27 @@ document.addEventListener('DOMContentLoaded', () => {
             for (let i = 0; i < count; i++) {
                 const groupDiv = document.createElement('div');
                 groupDiv.className = 'player-input-group';
+
                 const avatarSelect1 = document.createElement('select');
                 avatarSelect1.className = 'avatar-select avatar-select-1';
                 populateSelectWithOptions(avatarSelect1, AVATARS, AVATARS[i % AVATARS.length]);
+
                 const avatarSelect2 = document.createElement('select');
                 avatarSelect2.className = 'avatar-select avatar-select-2';
                 populateSelectWithOptions(avatarSelect2, AVATARS, AVATARS[(i + 1) % AVATARS.length]);
+
                 const nameInput = document.createElement('input');
                 nameInput.type = 'text';
                 nameInput.className = 'player-name-input';
                 nameInput.placeholder = `プレイヤー ${i + 1}`;
                 nameInput.value = '';
+
                 const randomBtn = document.createElement('button');
                 randomBtn.className = 'random-name-btn';
                 randomBtn.textContent = '自動名付け';
                 randomBtn.type = 'button';
                 randomBtn.addEventListener('click', () => setRandomPlayerInfo(groupDiv));
+
                 groupDiv.appendChild(avatarSelect1);
                 groupDiv.appendChild(avatarSelect2);
                 groupDiv.appendChild(nameInput);
@@ -158,20 +166,25 @@ document.addEventListener('DOMContentLoaded', () => {
             startGameButton.classList.add('hidden');
         }
     }
+
     populateSelectWithNumbers(minNumSelect, 60, 100, 70);
     populateSelectWithNumbers(maxNumSelect, 60, 100, 95);
     populateSelectWithNumbers(playerCountSelect, 1, 10, 2);
     generatePlayerNameInputs();
     playerCountSelect.addEventListener('change', generatePlayerNameInputs);
+
     startGameButton.addEventListener('click', () => {
         const minNum = parseInt(minNumSelect.value, 10);
         const maxNum = parseInt(maxNumSelect.value, 10);
         if (minNum >= maxNum) { alert('番号の範囲が正しくありません。'); return; }
         if ((maxNum - minNum + 1) < 24) { alert('ビンゴカードを作成するには、少なくとも24個のユニークな数字が必要です。'); return; }
+        
         todaysLuckyNumber = generateTodaysLuckyNumber();
         isTodaysLuckyNumberCalled = false;
+        
         luckyNumberSpan.textContent = todaysLuckyNumber;
         showModal('本日のラッキーナンバーは...', '', todaysLuckyNumber);
+        
         scoreInput.min = minNum; scoreInput.max = maxNum;
         calledNumbers = [];
         players = [];
@@ -185,6 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const suffix = getRandomItem(NAME_SUFFIXES);
                 name = `${noun}${suffix}`;
             }
+
             players.push({
                 id: index, name: name, avatar1: avatar1, avatar2: avatar2,
                 card: generateCardData(minNum, maxNum),
@@ -195,6 +209,8 @@ document.addEventListener('DOMContentLoaded', () => {
         hintWord.textContent = '難易度を選んでね';
         renderAll();
     });
+
+    // --- ゲームロジックの中核関数 ---
     function generateTodaysLuckyNumber() {
         const today = new Date();
         const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
@@ -203,6 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const range = 92 - 80 + 1;
         return (x & 0x7FFFFFFF) % range + 80;
     }
+
     function addNumberToGame(score) {
         if (calledNumbers.includes(score)) return;
         calledNumbers.push(score);
@@ -216,10 +233,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const prevBingoCount = player.bingoCount;
             player.card.forEach(row => row.forEach(cell => { if (cell.number == score) { cell.marked = true; } }));
             updatePlayerStatus(player);
-            if (player.bingoCount > prevBingoCount) { confetti(); }
+            if (player.bingoCount > prevBingoCount) {
+                confetti();
+            }
         });
         renderAll();
     }
+
     function removeNumberFromGame(numberToRemove) {
         calledNumbers = calledNumbers.filter(num => num !== numberToRemove);
         players.forEach(player => {
@@ -228,6 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         renderAll();
     }
+    
     function updatePlayerStatus(player) {
         const card = player.card;
         let bingoCount = 0, reachLines = 0;
@@ -243,7 +264,13 @@ document.addEventListener('DOMContentLoaded', () => {
         player.bingoCount = bingoCount;
         player.isReach = bingoCount === 0 && reachLines > 0;
     }
-    function renderAll() { renderAllPlayerCards(); renderCalledNumbers(); }
+    
+    // --- 描画関連 ---
+    function renderAll() {
+        renderAllPlayerCards();
+        renderCalledNumbers();
+    }
+    
     function renderAllPlayerCards() {
         playersContainer.innerHTML = '';
         players.forEach(player => {
@@ -265,7 +292,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         cellDiv.dataset.number = cellData.number;
                     }
                     grid.appendChild(cellDiv);
-                });
+});
             });
             playerCardDiv.appendChild(grid);
             const resultP = document.createElement('p');
@@ -275,6 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
             playersContainer.appendChild(playerCardDiv);
         });
     }
+
     function renderCalledNumbers() {
         calledNumbersList.innerHTML = '';
         calledNumbers.sort((a, b) => a - b).forEach(num => {
@@ -285,6 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
             calledNumbersList.appendChild(numDiv);
         });
     }
+
     function generateCardData(min, max) {
         let card = Array(BINGO_SIZE).fill(null).map(() => Array(BINGO_SIZE).fill(null));
         const numbers = [];
@@ -299,6 +328,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         return card;
     }
+
+    // --- イベントリスナー ---
     function showModal(title, message, luckyNumber = null) {
         modalTitle.textContent = title; modalMessage.textContent = message;
         if (luckyNumber) {
@@ -309,11 +340,35 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         modalContainer.classList.remove('hidden');
     }
+
+    function displayHint(text) {
+        hintWord.innerHTML = text;
+        hintWord.classList.remove('fadeIn');
+        void hintWord.offsetWidth;
+        hintWord.classList.add('fadeIn');
+    }
+    easyHintBtn.addEventListener('click', () => displayHint(getRandomItem(HINT_THEMES)));
+    normalHintBtn.addEventListener('click', () => {
+        let hint1 = getRandomItem(HINT_THEMES);
+        let hint2;
+        do { hint2 = getRandomItem(HINT_SPECIFICS); } while (hint1 === hint2);
+        displayHint(`${hint1}<span class="hint-separator">×</span>${hint2}`);
+    });
+    hardHintBtn.addEventListener('click', () => {
+        let hint1 = getRandomItem(HINT_SPECIFICS);
+        let hint2;
+        do { hint2 = getRandomItem(HINT_SPECIFICS); } while (hint1 === hint2);
+        displayHint(`${hint1}<span class="hint-separator">×</span>${hint2}`);
+    });
     function handleCellClick(event) {
         const cell = event.target;
         if (!cell.classList.contains('cell') || cell.classList.contains('free') || !cell.dataset.number) return;
         const number = parseInt(cell.dataset.number, 10);
-        if (calledNumbers.includes(number)) { removeNumberFromGame(number); } else { addNumberToGame(number); }
+        if (calledNumbers.includes(number)) {
+            removeNumberFromGame(number);
+        } else {
+            addNumberToGame(number);
+        }
     }
     function handleCalledNumberClick(event) {
         const target = event.target;
