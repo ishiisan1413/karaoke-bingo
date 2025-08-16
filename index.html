@@ -12,6 +12,14 @@
 
     <div id="setup-screen">
         <h2>ゲームの準備</h2>
+        
+        <div class="setup-control">
+            <label for="min-num">数字の範囲: </label>
+            <input type="number" id="min-num" value="70">
+            <span> ～ </span>
+            <input type="number" id="max-num" value="99">
+        </div>
+
         <div class="setup-control">
             <label for="player-count">プレイヤー数 (1〜10): </label>
             <input type="number" id="player-count" min="1" max="10" value="1">
@@ -23,7 +31,7 @@
 
     <div id="game-screen" class="hidden">
         <div class="controls">
-            <input type="number" id="scoreInput" min="70" max="99" placeholder="採点結果を入力">
+            <input type="number" id="scoreInput" placeholder="採点結果を入力">
             <button id="submitScore">入力</button>
         </div>
 
