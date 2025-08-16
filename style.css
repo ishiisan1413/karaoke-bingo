@@ -3,7 +3,6 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     background-color: #f0f8ff;
     color: #333;
     padding: 20px;
@@ -13,6 +12,32 @@ h1 {
     color: #ff4500;
 }
 
+/* 汎用クラス */
+.hidden {
+    display: none !important;
+}
+
+/* セットアップ画面 */
+#setup-screen {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+}
+.setup-control, #player-names-container div {
+    margin: 15px 0;
+}
+#player-names-container input {
+    margin-left: 10px;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+/* ゲーム画面 */
 .controls {
     margin-bottom: 20px;
 }
@@ -34,34 +59,72 @@ button {
     background-color: #1e90ff;
     color: white;
     margin-left: 10px;
+    transition: background-color 0.2s;
+}
+button:hover {
+    background-color: #0073e6;
 }
 
-#resetButton {
+#resetButton, #start-game-button {
     background-color: #ff6347;
     margin-top: 20px;
 }
+#resetButton:hover, #start-game-button:hover {
+    background-color: #e5533d;
+}
 
-#bingo-card {
-    display: grid;
-    grid-template-columns: repeat(5, 60px);
-    grid-template-rows: repeat(5, 60px);
-    gap: 5px;
+/* プレイヤーカードコンテナ */
+#players-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    width: 100%;
+}
+
+.player-card {
+    background: #fff;
     border: 2px solid #333;
-    padding: 5px;
-    background-color: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.player-name {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.bingo-result {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    color: #dc143c;
+    margin-top: 10px;
+    min-height: 25px;
+}
+
+/* ビンゴカード本体 */
+.bingo-card-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 50px);
+    grid-template-rows: repeat(5, 50px);
+    gap: 4px;
 }
 
 .cell {
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
+    font-size: 16px;
     font-weight: bold;
     border: 1px solid #ccc;
     background-color: #f9f9f9;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s, transform 0.3s;
 }
 
 .cell.free {
@@ -72,12 +135,4 @@ button {
     background-color: #87cefa;
     color: white;
     transform: scale(1.05);
-    box-shadow: 0 0 10px rgba(0,0,0,0.2);
-}
-
-#resultMessage {
-    margin-top: 20px;
-    font-size: 24px;
-    font-weight: bold;
-    color: #dc143c;
 }
