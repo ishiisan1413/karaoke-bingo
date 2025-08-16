@@ -10,17 +10,28 @@
 
     <h1>カラオケ採点ビンゴ 🎤</h1>
 
-    <div class="controls">
-        <input type="number" id="scoreInput" min="70" max="99" placeholder="採点結果を入力">
-        <button id="submitScore">入力</button>
+    <div id="setup-screen">
+        <h2>ゲームの準備</h2>
+        <div class="setup-control">
+            <label for="player-count">プレイヤー数 (1〜10): </label>
+            <input type="number" id="player-count" min="1" max="10" value="1">
+            <button id="set-players-button">プレイヤー名を入力</button>
+        </div>
+        <div id="player-names-container"></div>
+        <button id="start-game-button" class="hidden">ゲーム開始！</button>
     </div>
 
-    <div id="bingo-card">
+    <div id="game-screen" class="hidden">
+        <div class="controls">
+            <input type="number" id="scoreInput" min="70" max="99" placeholder="採点結果を入力">
+            <button id="submitScore">入力</button>
         </div>
 
-    <button id="resetButton">新しいカードで始める</button>
+        <div id="players-container">
+            </div>
 
-    <p id="resultMessage"></p>
+        <button id="resetButton">新しいゲームを準備する</button>
+    </div>
 
     <script src="script.js"></script>
 </body>
