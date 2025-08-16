@@ -1,104 +1,378 @@
 body {
-    font-family: sans-serif; display: flex; flex-direction: column; align-items: center;
-    background-color: #f0f8ff; color: #333; padding: 20px 20px 50px 20px;
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #f0f8ff;
+    color: #333;
+    padding: 20px 20px 50px 20px;
 }
-h1 { color: #ff4500; font-size: 2.5em; }
-.hidden { display: none !important; }
+
+h1 {
+    color: #ff4500;
+    font-size: 2.5em;
+}
+
+.hidden {
+    display: none !important;
+}
 
 /* セットアップ画面 */
 #setup-screen {
-    background-color: white; padding: 30px; border-radius: 12px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 90%; max-width: 600px;
-    text-align: center; font-size: 1.2em;
+    background-color: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    width: 90%;
+    max-width: 600px;
+    text-align: center;
+    font-size: 1.2em;
 }
-.setup-control, .player-input-group { margin: 20px 0; }
-.player-input-group { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 10px; }
+
+.setup-control, .player-input-group {
+    margin: 20px 0;
+}
+
+.player-input-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
 #player-names-container input, .setup-control input {
-    margin-left: 10px; padding: 12px; border-radius: 6px; border: 1px solid #ccc; font-size: 1em;
+    margin-left: 10px;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 1em;
 }
-.avatar-input { width: 60px; text-align: center; }
+
+.avatar-input {
+    width: 60px;
+    text-align: center;
+    font-size: 1.2em;
+    padding: 8px !important;
+}
 
 /* ゲーム画面 */
-.controls { margin: 20px 0; transform: scale(1.2); transform-origin: top center; }
-#scoreInput { padding: 12px; font-size: 18px; width: 180px; border: 2px solid #ccc; border-radius: 8px; }
-button {
-    padding: 12px 24px; font-size: 18px; cursor: pointer; border: none; border-radius: 8px;
-    background-color: #1e90ff; color: white; margin-left: 10px; transition: background-color 0.2s;
+.controls {
+    margin: 20px 0;
+    transform: scale(1.2);
+    transform-origin: top center;
 }
-button:hover { background-color: #0073e6; }
-#resetButton, #start-game-button { background-color: #ff6347; margin-top: 30px; transform: scale(1.1); }
-#resetButton:hover, #start-game-button:hover { background-color: #e5533d; }
+
+#scoreInput {
+    padding: 12px;
+    font-size: 18px;
+    width: 180px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+}
+
+button {
+    padding: 12px 24px;
+    font-size: 18px;
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+    background-color: #1e90ff;
+    color: white;
+    margin-left: 10px;
+    transition: background-color 0.2s;
+}
+
+button:hover {
+    background-color: #0073e6;
+}
+
+#resetButton, #start-game-button {
+    background-color: #ff6347;
+    margin-top: 30px;
+    transform: scale(1.1);
+}
+
+#resetButton:hover, #start-game-button:hover {
+    background-color: #e5533d;
+}
 
 /* 出現済み番号リスト */
 #called-numbers-container {
-    background: #fff; border-radius: 12px; padding: 15px; margin-bottom: 20px;
-    width: 95%; max-width: 800px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background: #fff;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+    width: 95%;
+    max-width: 800px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
-#called-numbers-container h3 { text-align: center; margin: 0 0 10px 0; }
-#called-numbers-container h3 small { font-size: 0.6em; color: #888; }
-#called-numbers-list { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+
+#called-numbers-container h3 {
+    text-align: center;
+    margin: 0 0 10px 0;
+}
+
+#called-numbers-container h3 small {
+    font-size: 0.6em;
+    color: #888;
+}
+
+#called-numbers-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
 .called-number {
-    background: #e0e0e0; border-radius: 50%; width: 40px; height: 40px;
-    display: flex; justify-content: center; align-items: center;
-    font-weight: bold; cursor: pointer; transition: background-color 0.2s;
+    background: #e0e0e0;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
 }
-.called-number:hover { background: #ff7f7f; }
+
+.called-number:hover {
+    background: #ff7f7f;
+    color: white;
+}
 
 /* プレイヤーカード */
-#players-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; width: 100%; }
+#players-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+    width: 100%;
+}
+
 .player-card {
-    background: #fff; border: 3px solid #333; padding: 15px; border-radius: 12px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: all 0.3s;
+    background: #fff;
+    border: 3px solid #333;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s;
 }
-.player-info { text-align: center; }
-.player-avatar { font-size: 2em; }
-.player-name { font-size: 1.5em; font-weight: bold; margin: 0 5px; }
+
+.player-info {
+    text-align: center;
+}
+
+.player-avatar {
+    font-size: 2em;
+    vertical-align: middle;
+}
+
+.player-name {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin: 0 5px;
+    vertical-align: middle;
+}
+
 .player-title {
-    display: block; font-size: 0.8em; color: #666; background-color: #f0f0f0;
-    border-radius: 10px; padding: 2px 8px; margin-top: 5px; min-height: 20px;
+    display: block;
+    font-size: 0.8em;
+    color: #666;
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    padding: 2px 8px;
+    margin-top: 5px;
+    min-height: 20px;
+    display: inline-block;
 }
+
 .bingo-result {
-    text-align: center; font-size: 1.5em; font-weight: bold;
-    color: #dc143c; margin-top: 15px; min-height: 30px;
+    text-align: center;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #dc143c;
+    margin-top: 15px;
+    min-height: 30px;
 }
-.player-card.reach { border-color: #ff4500; box-shadow: 0 0 20px #ff7f50; }
-.player-name.reach::after { content: ' (リーチ!)'; color: #ff4500; animation: pulse 1.5s infinite; }
-@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+.player-card.reach {
+    border-color: #ff4500;
+    box-shadow: 0 0 20px #ff7f50;
+}
+
+.player-name.reach::after {
+    content: ' (リーチ!)';
+    color: #ff4500;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
 
 /* ビンゴカード本体 */
 .bingo-card-grid {
-    margin-top: 15px; display: grid; grid-template-columns: repeat(5, 65px);
-    grid-template-rows: repeat(5, 65px); gap: 5px;
+    margin-top: 15px;
+    display: grid;
+    grid-template-columns: repeat(5, 65px);
+    grid-template-rows: repeat(5, 65px);
+    gap: 5px;
 }
-.cell {
-    width: 65px; height: 65px; display: flex; align-items: center; justify-content: center;
-    font-size: 1.6em; font-weight: bold; border: 1px solid #ccc;
-    background-color: #f9f9f9; transition: all 0.2s; cursor: pointer;
-}
-.cell.free { background-color: #ffd700; }
-.cell.marked { background-color: #87cefa; color: white; transform: scale(1.05); }
 
-/* ★ 選曲ヒント */
+.cell {
+    width: 65px;
+    height: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6em;
+    font-weight: bold;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.cell.free {
+    background-color: #ffd700;
+    cursor: default;
+}
+
+.cell.marked {
+    background-color: #87cefa;
+    color: white;
+    transform: scale(1.05);
+}
+
+/* 選曲ヒント */
 #hint-container {
-    background: #fff; border: 2px solid #ccc; border-radius: 12px;
-    padding: 20px; margin: 30px 0; width: 90%; max-width: 500px;
-    text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    background: #fff;
+    border: 2px solid #ccc;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 30px 0;
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
-#hint-container h3 { margin: 0 0 15px 0; font-size: 1.3em; color: #333; }
+
+#hint-container h3 {
+    margin: 0 0 15px 0;
+    font-size: 1.3em;
+    color: #333;
+}
+
 #hint-word {
-    font-size: 2.2em; font-weight: bold; min-height: 50px; color: #1e90ff;
-    margin: 10px 0 20px 0; animation: fadeIn 0.5s;
+    font-size: 2.2em;
+    font-weight: bold;
+    min-height: 50px;
+    color: #1e90ff;
+    margin: 10px 0 20px 0;
+    display: block;
+    animation: fadeIn 0.5s;
 }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-.hint-buttons { display: flex; justify-content: center; gap: 10px; }
-.hint-btn { flex: 1; font-weight: bold; }
-.hint-btn.easy { background-color: #28a745; }
-.hint-btn.normal { background-color: #007bff; }
-.hint-btn.hard { background-color: #dc3545; }
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hint-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.hint-btn {
+    flex: 1;
+    font-weight: bold;
+    margin-left: 0;
+}
+
+.hint-btn.easy {
+    background-color: #28a745;
+}
+.hint-btn.easy:hover {
+    background-color: #218838;
+}
+
+.hint-btn.normal {
+    background-color: #007bff;
+}
+.hint-btn.normal:hover {
+    background-color: #0069d9;
+}
+
+.hint-btn.hard {
+    background-color: #dc3545;
+}
+.hint-btn.hard:hover {
+    background-color: #c82333;
+}
 
 /* モーダルウィンドウ */
-.modal { /* (変更なし) */ }
-.modal-content { /* (変更なし) */ }
-.close-button { /* (変更なし) */ }
-.lucky-number-display { /* (変更なし) */ }
-@keyframes bounce { /* (変更なし) */ }
+.modal {
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 15px;
+    text-align: center;
+    position: relative;
+    font-size: 1.5em;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    max-width: 90%;
+}
+
+.close-button {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    color: #aaa;
+    font-size: 35px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.lucky-number-display {
+    font-size: 4em;
+    font-weight: bold;
+    color: #ff4500;
+    margin: 20px 0;
+    animation: bounce 1s;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-30px);
+    }
+    60% {
+        transform: translateY(-15px);
+    }
+}
