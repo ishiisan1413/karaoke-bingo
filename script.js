@@ -2,10 +2,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const BINGO_SIZE = 5;
     const OTHER_LUCKY_NUMBERS = [77, 88, 99];
     const AVATARS = ['🎤', '🍺', '👑', '✨', '🕺', '💃', '⭐', '❤️', '😎', '🤠', '🎉', '🥂', '🍾', '🍕', '🍓'];
-    const DEFAULT_PLAYER_NAMES = [
-        '常連さん', 'マスター', '謎の紳士', '噂の美女', '宴会部長', '盛り上げ隊長', 'ハイボール',
-        'タンバリンの神', '遅れてきた主役', '一見さん', 'とりあえず生', 'からあげ', '焼酎ロック'
+
+    // ★ 変更点: 新しい名前生成用のリストを2種類作成
+    const NAME_NOUNS = [
+        'ビール', '白ワイン', '赤ワイン', 'スパークリング', '水割り', '芋ロック', '麦ロック',
+        'ハイボール', 'レモンサワー', '日本酒', '大吟醸', '熱燗',
+        'カシオレ', 'ウーロンハイ', 'テキーラ', 'モヒート', '梅酒', '泡盛', 'ノンアル', 'ソフドリ',
+        'ポテサラ', 'お通し', '枝豆', '乾きもの', 'ピーナッツ', '冷奴', '酢もつ', 'イカの塩辛',
+        '軟骨揚げ', 'ハムカツ', 'ポテトフライ', '焼き鳥５本セット', 'えいひれ', 'ししゃも',
+        '〆ラーメン', '鮭おにぎり'
     ];
+    const NAME_SUFFIXES = [
+        'マスター', '紳士', '王子', '伯爵', '番長', '仙人', '戦士', '侍', '職人', '将軍', '姫', '兄貴', '姉貴',
+        'キング', 'プリンス', '先生', '国民', '卿', '勇者', '殿下', '皇帝', '浪人', '忍者', '隊長',
+        '太郎', 'ナイト', '船長', '貴族', '教授', 'おじさん', '殿', '師匠', '親方', '魔王', '提督'
+    ];
+
     const HINT_THEMES = [
         '1980年代', '1990年代', '2000年代', '2010年代', '昭和歌謡', '平成ヒット', '令和ソング', 
         '愛', '恋', '友情', '青春', '夢', '希望', '未来', '旅立ち', '卒業', '結婚',
@@ -60,25 +72,26 @@ document.addEventListener('DOMContentLoaded', () => {
     let todaysLuckyNumber = 0;
     let isTodaysLuckyNumberCalled = false;
 
-    // --- ★ 変更点: ランダム生成ボタンの処理 ---
+    // --- ★ 変更点: ランダム生成ボタンの処理を更新 ---
     function setRandomPlayerInfo(groupDiv) {
         const avatarSelect1 = groupDiv.querySelector('.avatar-select-1');
-        const avatarSelect2 = groupDiv.querySelector('.avatar-select-2');
+        const avatarSelect2 = group.querySelector('.avatar-select-2');
         const nameInput = groupDiv.querySelector('.player-name-input');
         
-        nameInput.value = getRandomItem(DEFAULT_PLAYER_NAMES);
+        const noun = getRandomItem(NAME_NOUNS);
+        const suffix = getRandomItem(NAME_SUFFIXES);
+        nameInput.value = `${noun}${suffix}`;
         
         let randomAvatar1 = getRandomItem(AVATARS);
         let randomAvatar2;
         do {
             randomAvatar2 = getRandomItem(AVATARS);
-        } while (randomAvatar1 === randomAvatar2); // アイコンが被らないようにする
+        } while (randomAvatar1 === randomAvatar2);
 
         avatarSelect1.value = randomAvatar1;
         avatarSelect2.value = randomAvatar2;
     }
 
-    // ★ 変更点: プレイヤー入力欄の生成ロジックを全面的に書き換え
     function generatePlayerNameInputs() {
         const count = parseInt(playerCountSelect.value, 10);
         playerNamesContainer.innerHTML = '';
@@ -87,27 +100,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 const groupDiv = document.createElement('div');
                 groupDiv.className = 'player-input-group';
 
-                // アイコン選択1
                 const avatarSelect1 = document.createElement('select');
                 avatarSelect1.className = 'avatar-select avatar-select-1';
-                populateSelect(avatarSelect1, AVATARS, AVATARS[i % AVATARS.length]);
+                populateSelectWithOptions(avatarSelect1, AVATARS, AVATARS[i % AVATARS.length]);
 
-                // アイコン選択2
                 const avatarSelect2 = document.createElement('select');
                 avatarSelect2.className = 'avatar-select avatar-select-2';
-                populateSelect(avatarSelect2, AVATARS, AVATARS[(i + 1) % AVATARS.length]);
+                populateSelectWithOptions(avatarSelect2, AVATARS, AVATARS[(i + 1) % AVATARS.length]);
 
-                // 名前入力
                 const nameInput = document.createElement('input');
                 nameInput.type = 'text';
                 nameInput.className = 'player-name-input';
                 nameInput.placeholder = `プレイヤー ${i + 1}`;
-                nameInput.value = ''; // デフォルトは空欄
+                nameInput.value = '';
 
-                // ランダムボタン
                 const randomBtn = document.createElement('button');
                 randomBtn.className = 'random-name-btn';
-                randomBtn.textContent = 'ランダム';
+                randomBtn.textContent = '自動名付け'; // ★ 変更点
+                randomBtn.type = 'button'; // form送信を防ぐ
                 randomBtn.addEventListener('click', () => setRandomPlayerInfo(groupDiv));
 
                 groupDiv.appendChild(avatarSelect1);
@@ -123,23 +133,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- 初期化処理 ---
-    function populateSelect(selectElement, options, defaultValue) {
-        if (Array.isArray(options)) {
-            options.forEach(opt => {
-                const option = document.createElement('option');
-                option.value = opt; option.textContent = opt;
-                selectElement.appendChild(option);
-            });
-        } else { // 数字の場合
-            for (let i = options; i <= end; i++) { // この部分は元のコードから修正が必要
-                const option = document.createElement('option');
-                option.value = i; option.textContent = i;
-                selectElement.appendChild(option);
-            }
-        }
-        selectElement.value = defaultValue;
-    }
-    // 上のpopulateSelectを修正
     function populateSelectWithOptions(selectElement, optionsArray, defaultValue) {
         optionsArray.forEach(opt => {
             const option = document.createElement('option');
@@ -182,7 +175,14 @@ document.addEventListener('DOMContentLoaded', () => {
         playerInputs.forEach((group, index) => {
             const avatar1 = group.querySelector('.avatar-select-1').value;
             const avatar2 = group.querySelector('.avatar-select-2').value;
-            const name = group.querySelector('.player-name-input').value || DEFAULT_PLAYER_NAMES[index % DEFAULT_PLAYER_NAMES.length];
+            // ★ 変更点: 空欄の場合もランダムな名前を生成する
+            let name = group.querySelector('.player-name-input').value;
+            if (!name) {
+                const noun = getRandomItem(NAME_NOUNS);
+                const suffix = getRandomItem(NAME_SUFFIXES);
+                name = `${noun}${suffix}`;
+            }
+
             players.push({
                 id: index, name: name, avatar1: avatar1, avatar2: avatar2,
                 card: generateCardData(minNum, maxNum),
@@ -194,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderAll();
     });
 
-    // --- ★ 変更点: 描画処理をアイコン2つに対応 ---
+    // --- 描画関連 ---
     function renderAllPlayerCards() {
         playersContainer.innerHTML = '';
         players.forEach(player => {
