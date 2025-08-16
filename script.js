@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // (定数リストは変更なし)
     const BINGO_SIZE = 5;
     const OTHER_LUCKY_NUMBERS = [77, 88, 99];
     const AVATARS = ['🎤', '🍺', '👑', '✨', '🕺', '💃', '⭐', '❤️', '😎', '🤠'];
+
     const HINT_THEMES = [
         '1980年代', '1990年代', '2000年代', '2010年代', '昭和歌謡', '平成ヒット', '令和ソング', 
         '愛', '恋', '友情', '青春', '夢', '希望', '未来', '旅立ち', '卒業', '結婚',
@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
         'デビュー曲が大ヒット', '解散したグループ'
     ];
 
+
     // DOM要素
     const setupScreen = document.getElementById('setup-screen');
     const gameScreen = document.getElementById('game-screen');
@@ -50,23 +51,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const easyHintBtn = document.getElementById('easy-hint-btn');
     const normalHintBtn = document.getElementById('normal-hint-btn');
     const hardHintBtn = document.getElementById('hard-hint-btn');
-    const luckyNumberSpan = document.getElementById('lucky-number-span'); // ★ 変更点
+    const luckyNumberSpan = document.getElementById('lucky-number-span');
 
-    // (ゲームデータは変更なし)
+    // ゲームデータ
     let players = [];
     let calledNumbers = [];
     let todaysLuckyNumber = 0;
     let isTodaysLuckyNumberCalled = false;
-    
-    // (ヘルパー関数、初期化処理などは変更なし)
+
+    // --- 初期化処理 ---
     function populateSelect(selectElement, start, end, defaultValue) {
         for (let i = start; i <= end; i++) {
             const option = document.createElement('option');
-            option.value = i; option.textContent = i;
+            option.value = i;
+            option.textContent = i;
             selectElement.appendChild(option);
         }
         selectElement.value = defaultValue;
     }
+
     function generatePlayerNameInputs() {
         const count = parseInt(playerCountSelect.value, 10);
         playerNamesContainer.innerHTML = '';
@@ -94,9 +97,10 @@ document.addEventListener('DOMContentLoaded', () => {
             startGameButton.classList.add('hidden');
         }
     }
+    // ★ 変更点: デフォルト値を更新
     populateSelect(minNumSelect, 60, 100, 70);
-    populateSelect(maxNumSelect, 60, 100, 99);
-    populateSelect(playerCountSelect, 1, 10, 1);
+    populateSelect(maxNumSelect, 60, 100, 95); // デフォルト95に変更
+    populateSelect(playerCountSelect, 1, 10, 2); // デフォルト2人に変更
     generatePlayerNameInputs();
     playerCountSelect.addEventListener('change', generatePlayerNameInputs);
 
@@ -109,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
         todaysLuckyNumber = generateTodaysLuckyNumber();
         isTodaysLuckyNumberCalled = false;
         
-        luckyNumberSpan.textContent = todaysLuckyNumber; // ★ 変更点: 常時表示エリアにセット
+        luckyNumberSpan.textContent = todaysLuckyNumber;
         showModal('本日のラッキーナンバーは...', '', todaysLuckyNumber);
         
         scoreInput.min = minNum; scoreInput.max = maxNum;
@@ -120,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const avatar = group.querySelector('.avatar-input').value;
             const name = group.querySelector('.player-name-input').value || `Player ${index + 1}`;
             players.push({
-                id: index, name: name, avatar: avatar, title: '',
+                id: index, name: name, avatar: avatar,
                 card: generateCardData(minNum, maxNum),
                 bingoCount: 0, isReach: false
             });
@@ -130,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderAll();
     });
 
-    // (以下の関数は、前回の回答から一切変更ありませんので、そのままお使いください)
+    // --- ゲームロジックの中核関数 ---
     function generateTodaysLuckyNumber() {
         const today = new Date();
         const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
@@ -139,56 +143,72 @@ document.addEventListener('DOMContentLoaded', () => {
         const range = 92 - 80 + 1;
         return (x & 0x7FFFFFFF) % range + 80;
     }
-    function showModal(title, message, luckyNumber = null) {
-        modalTitle.textContent = title; modalMessage.textContent = message;
-        if (luckyNumber) {
-            modalLuckyNumber.textContent = luckyNumber;
-            modalLuckyNumber.classList.remove('hidden');
-        } else {
-            modalLuckyNumber.classList.add('hidden');
+
+    function addNumberToGame(score) {
+        if (calledNumbers.includes(score)) return;
+        calledNumbers.push(score);
+        if (score === todaysLuckyNumber && !isTodaysLuckyNumberCalled) {
+            isTodaysLuckyNumberCalled = true;
+            showModal('おめでとうございます！', `本日のラッキーナンバー【${score}】が出ました！特別なサービスがあるかも...？`);
+        } else if (OTHER_LUCKY_NUMBERS.includes(score)) {
+            showModal('🎉 ラッキーナンバー！ 🎉', `ゾロ目【${score}】が出ました！何か良いことがあるかも！`);
         }
-        modalContainer.classList.remove('hidden');
-    }
-    function getRandomItem(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-    function displayHint(text) {
-        hintWord.textContent = text;
-        hintWord.classList.remove('fadeIn');
-        void hintWord.offsetWidth;
-        hintWord.classList.add('fadeIn');
-    }
-    easyHintBtn.addEventListener('click', () => displayHint(getRandomItem(HINT_THEMES)));
-    normalHintBtn.addEventListener('click', () => {
-        let hint1 = getRandomItem(HINT_THEMES);
-        let hint2;
-        do { hint2 = getRandomItem(HINT_THEMES.concat(HINT_SPECIFICS.slice(0, 11))); } while (hint1 === hint2);
-        displayHint(`${hint1} & ${hint2}`);
-    });
-    hardHintBtn.addEventListener('click', () => displayHint(`${getRandomItem(HINT_THEMES)} & ${getRandomItem(HINT_SPECIFICS)}`));
-    function generateCardData(min, max) {
-        let card = Array(BINGO_SIZE).fill(null).map(() => Array(BINGO_SIZE).fill(null));
-        const numbers = [];
-        for (let i = min; i <= max; i++) { numbers.push(i); }
-        for (let i = numbers.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [numbers[i], numbers[j]] = [numbers[j], numbers[i]]; }
-        let numberIndex = 0;
-        for (let row = 0; row < BINGO_SIZE; row++) {
-            for (let col = 0; col < BINGO_SIZE; col++) {
-                if (row === 2 && col === 2) { card[row][col] = { number: 'FREE', marked: true }; }
-                else { card[row][col] = { number: numbers[numberIndex++], marked: false }; }
+        players.forEach(player => {
+            const prevBingoCount = player.bingoCount;
+            player.card.forEach(row => row.forEach(cell => { if (cell.number == score) { cell.marked = true; } }));
+            
+            updatePlayerStatus(player);
+
+            // ★ 変更点: 称号獲得のロジックを削除
+
+            if (player.bingoCount > prevBingoCount) {
+                confetti();
             }
-        }
-        return card;
+        });
+        renderAll();
     }
+
+    function removeNumberFromGame(numberToRemove) {
+        calledNumbers = calledNumbers.filter(num => num !== numberToRemove);
+        players.forEach(player => {
+            player.card.forEach(row => row.forEach(cell => { if (cell.number === numberToRemove) cell.marked = false; }));
+            updatePlayerStatus(player);
+        });
+        renderAll();
+    }
+    
+    function updatePlayerStatus(player) {
+        const card = player.card;
+        let bingoCount = 0, reachLines = 0;
+        const lines = [];
+        for (let i = 0; i < BINGO_SIZE; i++) { lines.push(card[i]); lines.push(card.map(row => row[i])); }
+        lines.push(card.map((row, i) => row[i]));
+        lines.push(card.map((row, i) => row[BINGO_SIZE - 1 - i]));
+        lines.forEach(line => {
+            const unmarkedCount = line.filter(cell => !cell.marked).length;
+            if (unmarkedCount === 0) bingoCount++;
+            if (unmarkedCount === 1) reachLines++;
+        });
+        player.bingoCount = bingoCount;
+        player.isReach = bingoCount === 0 && reachLines > 0;
+    }
+    
+    // --- 描画関連 ---
     function renderAll() {
         renderAllPlayerCards();
         renderCalledNumbers();
     }
+    
     function renderAllPlayerCards() {
         playersContainer.innerHTML = '';
         players.forEach(player => {
             const playerCardDiv = document.createElement('div');
             playerCardDiv.className = 'player-card';
             if (player.isReach) playerCardDiv.classList.add('reach');
-            playerCardDiv.innerHTML = `<div class="player-info"><span class="player-avatar">${player.avatar}</span><span class="player-name ${player.isReach ? 'reach' : ''}">${player.name}</span><span class="player-title">${player.title || ''}</span></div>`;
+
+            // ★ 変更点: 称号(title)の表示を削除
+            playerCardDiv.innerHTML = `<div class="player-info"><span class="player-avatar">${player.avatar}</span><span class="player-name ${player.isReach ? 'reach' : ''}">${player.name}</span></div>`;
+            
             const grid = document.createElement('div');
             grid.className = 'bingo-card-grid';
             player.card.forEach((rowData, rIndex) => {
@@ -213,6 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
             playersContainer.appendChild(playerCardDiv);
         });
     }
+
     function renderCalledNumbers() {
         calledNumbersList.innerHTML = '';
         calledNumbers.sort((a, b) => a - b).forEach(num => {
@@ -223,46 +244,53 @@ document.addEventListener('DOMContentLoaded', () => {
             calledNumbersList.appendChild(numDiv);
         });
     }
-    function addNumberToGame(score) {
-        if (calledNumbers.includes(score)) return;
-        calledNumbers.push(score);
-        if (score === todaysLuckyNumber && !isTodaysLuckyNumberCalled) {
-            isTodaysLuckyNumberCalled = true;
-            showModal('おめでとうございます！', `本日のラッキーナンバー【${score}】が出ました！特別なサービスがあるかも...？`);
-        } else if (OTHER_LUCKY_NUMBERS.includes(score)) {
-            showModal('🎉 ラッキーナンバー！ 🎉', `ゾロ目【${score}】が出ました！何か良いことがあるかも！`);
+
+    function generateCardData(min, max) {
+        let card = Array(BINGO_SIZE).fill(null).map(() => Array(BINGO_SIZE).fill(null));
+        const numbers = [];
+        for (let i = min; i <= max; i++) { numbers.push(i); }
+        for (let i = numbers.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [numbers[i], numbers[j]] = [numbers[j], numbers[i]]; }
+        let numberIndex = 0;
+        for (let row = 0; row < BINGO_SIZE; row++) {
+            for (let col = 0; col < BINGO_SIZE; col++) {
+                if (row === 2 && col === 2) { card[row][col] = { number: 'FREE', marked: true }; }
+                else { card[row][col] = { number: numbers[numberIndex++], marked: false }; }
+            }
         }
-        players.forEach(player => {
-            const prevBingoCount = player.bingoCount;
-            let numberFound = false;
-            player.card.forEach(row => row.forEach(cell => { if (cell.number == score) { cell.marked = true; numberFound = true; } }));
-            if (numberFound) {
-                if (score >= 95 && !player.title.includes('美声の持ち主')) {
-                    player.title = player.title ? `${player.title} / 美声の持ち主` : '美声の持ち主';
-                    showModal('称号ゲット！', `${player.name} さんは「美声の持ち主」の称号を獲得しました！`);
-                }
-                if (score === todaysLuckyNumber) {
-                     player.title = player.title ? `${player.title} / ラッキースター` : 'ラッキースター';
-                }
-            }
-            updatePlayerStatus(player);
-            if (player.bingoCount > prevBingoCount) {
-                confetti();
-                if (!player.title.includes('ビンゴマスター')) {
-                     player.title = player.title ? `${player.title} / ビンゴマスター` : 'ビンゴマスター';
-                }
-            }
-        });
-        renderAll();
+        return card;
     }
-    function removeNumberFromGame(numberToRemove) {
-        calledNumbers = calledNumbers.filter(num => num !== numberToRemove);
-        players.forEach(player => {
-            player.card.forEach(row => row.forEach(cell => { if (cell.number === numberToRemove) cell.marked = false; }));
-            updatePlayerStatus(player);
-        });
-        renderAll();
+
+    // --- イベントリスナー ---
+    function showModal(title, message, luckyNumber = null) {
+        modalTitle.textContent = title; modalMessage.textContent = message;
+        if (luckyNumber) {
+            modalLuckyNumber.textContent = luckyNumber;
+            modalLuckyNumber.classList.remove('hidden');
+        } else {
+            modalLuckyNumber.classList.add('hidden');
+        }
+        modalContainer.classList.remove('hidden');
     }
+    function getRandomItem(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+    function displayHint(text) {
+        hintWord.textContent = text;
+        hintWord.classList.remove('fadeIn');
+        void hintWord.offsetWidth;
+        hintWord.classList.add('fadeIn');
+    }
+    easyHintBtn.addEventListener('click', () => displayHint(getRandomItem(HINT_THEMES)));
+    normalHintBtn.addEventListener('click', () => {
+        let hint1 = getRandomItem(HINT_THEMES);
+        let hint2;
+        do { hint2 = getRandomItem(HINT_SPECIFICS); } while (hint1 === hint2);
+        displayHint(`${hint1} & ${hint2}`);
+    });
+    hardHintBtn.addEventListener('click', () => {
+        let hint1 = getRandomItem(HINT_SPECIFICS);
+        let hint2;
+        do { hint2 = getRandomItem(HINT_SPECIFICS); } while (hint1 === hint2);
+        displayHint(`${hint1} & ${hint2}`);
+    });
     function handleCellClick(event) {
         const cell = event.target;
         if (!cell.classList.contains('cell') || cell.classList.contains('free') || !cell.dataset.number) return;
@@ -288,26 +316,12 @@ document.addEventListener('DOMContentLoaded', () => {
         addNumberToGame(score);
         scoreInput.value = '';
     });
-    function updatePlayerStatus(player) {
-        const card = player.card;
-        let bingoCount = 0, reachLines = 0;
-        const lines = [];
-        for (let i = 0; i < BINGO_SIZE; i++) { lines.push(card[i]); lines.push(card.map(row => row[i])); }
-        lines.push(card.map((row, i) => row[i]));
-        lines.push(card.map((row, i) => row[BINGO_SIZE - 1 - i]));
-        lines.forEach(line => {
-            const unmarkedCount = line.filter(cell => !cell.marked).length;
-            if (unmarkedCount === 0) bingoCount++;
-            if (unmarkedCount === 1) reachLines++;
-        });
-        player.bingoCount = bingoCount;
-        player.isReach = bingoCount === 0 && reachLines > 0;
-    }
     resetButton.addEventListener('click', () => {
         gameScreen.classList.add('hidden'); setupScreen.classList.remove('hidden');
         playerNamesContainer.innerHTML = ''; startGameButton.classList.add('hidden');
-        playerCountSelect.value = '1'; hintWord.textContent = '難易度を選んでね';
-        generatePlayerNameInputs(); // ★ 追記: リセット時も入力欄を再表示
+        playerCountSelect.value = '2'; // ★ 変更点: デフォルトを2人に
+        hintWord.textContent = '難易度を選んでね';
+        generatePlayerNameInputs();
     });
     playersContainer.addEventListener('click', handleCellClick);
     calledNumbersList.addEventListener('click', handleCalledNumberClick);
