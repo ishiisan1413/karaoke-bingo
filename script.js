@@ -5,8 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // DOM要素
     const setupScreen = document.getElementById('setup-screen');
     const gameScreen = document.getElementById('game-screen');
-    const minNumInput = document.getElementById('min-num'); // ★ 変更点
-    const maxNumInput = document.getElementById('max-num'); // ★ 変更点
+    const minNumInput = document.getElementById('min-num');
+    const maxNumInput = document.getElementById('max-num');
     const playerCountInput = document.getElementById('player-count');
     const setPlayersButton = document.getElementById('set-players-button');
     const playerNamesContainer = document.getElementById('player-names-container');
@@ -21,7 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- セットアップ関連の処理 ---
 
-    // プレイヤー数に応じて名前入力欄を生成
     setPlayersButton.addEventListener('click', () => {
         const count = parseInt(playerCountInput.value, 10);
         if (count < 1 || count > 10) {
@@ -44,13 +43,10 @@ document.addEventListener('DOMContentLoaded', () => {
         startGameButton.classList.remove('hidden');
     });
 
-    // ゲーム開始処理
     startGameButton.addEventListener('click', () => {
-        // ★ 変更点: HTMLから範囲を取得
         const minNum = parseInt(minNumInput.value, 10);
         const maxNum = parseInt(maxNumInput.value, 10);
 
-        // ★ 変更点: 範囲の妥当性チェック
         if (isNaN(minNum) || isNaN(maxNum) || minNum >= maxNum) {
             alert('有効な数字の範囲を入力してください。');
             return;
@@ -60,7 +56,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        // ゲーム画面の入力欄に範囲を設定
         scoreInput.min = minNum;
         scoreInput.max = maxNum;
 
@@ -70,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
             players.push({
                 id: index,
                 name: input.value || `Player ${index + 1}`,
-                card: generateCardData(minNum, maxNum), // ★ 変更点
+                card: generateCardData(minNum, maxNum),
                 bingoCount: 0
             });
         });
@@ -82,11 +77,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- ゲーム中の処理 ---
 
-    // ビンゴカードのデータ構造を生成（DOM操作はしない）
-    function generateCardData(min, max) { // ★ 変更点: 引数を受け取る
+    function generateCardData(min, max) {
         let card = Array(BINGO_SIZE).fill(null).map(() => Array(BINGO_SIZE).fill(null));
         const numbers = [];
-        for (let i = min; i <= max; i++) { // ★ 変更点
+        for (let i = min; i <= max; i++) {
             numbers.push(i);
         }
         for (let i = numbers.length - 1; i > 0; i--) {
@@ -106,7 +100,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return card;
     }
 
-    // 全プレイヤーのカードを描画
     function renderAllPlayerCards() {
         playersContainer.innerHTML = '';
         players.forEach(player => {
@@ -130,6 +123,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     if (cellData.number === 'FREE') {
                         cellDiv.classList.add('free');
+                    } else {
+                        // ★ 変更点 1: クリック識別のためにdata属性を追加
+                        cellDiv.dataset.playerId = player.id;
+                        cellDiv.dataset.number = cellData.number;
                     }
                     grid.appendChild(cellDiv);
                 });
@@ -137,11 +134,40 @@ document.addEventListener('DOMContentLoaded', () => {
             updateBingoStatus(player);
         });
     }
+    
+    // ★ 変更点 2: マスをクリックしたときの処理を追加
+    function handleCellClick(event) {
+        const cell = event.target;
+        // クリックしたのが、data属性を持つマスでなければ何もしない
+        if (!cell.classList.contains('cell') || !cell.dataset.playerId) {
+            return;
+        }
 
-    // 数字入力の処理
+        const playerId = parseInt(cell.dataset.playerId, 10);
+        const number = parseInt(cell.dataset.number, 10);
+        const player = players.find(p => p.id === playerId);
+
+        // プレイヤーが見つかり、まだマークされていなければ処理する
+        if (player && !cell.classList.contains('marked')) {
+            let marked = false;
+            for (let row of player.card) {
+                for (let cellData of row) {
+                    if (cellData.number == number) {
+                        cellData.marked = true;
+                        marked = true;
+                        break;
+                    }
+                }
+                if (marked) break;
+            }
+            
+            checkBingo(player);
+            renderAllPlayerCards(); // 全体を再描画して見た目を更新
+        }
+    }
+
     submitScoreButton.addEventListener('click', () => {
         const score = parseInt(scoreInput.value, 10);
-        // ★ 変更点: 動的に設定された範囲でバリデーション
         const min = parseInt(scoreInput.min, 10);
         const max = parseInt(scoreInput.max, 10);
         if (!score || score < min || score > max) {
@@ -157,7 +183,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 全プレイヤーのカードで数字をマーク
     function markNumberForAllPlayers(score) {
         players.forEach(player => {
             player.card.forEach(rowData => {
@@ -172,7 +197,6 @@ document.addEventListener('DOMContentLoaded', () => {
         renderAllPlayerCards();
     }
 
-    // 特定のプレイヤーのビンゴをチェック
     function checkBingo(player) {
         let count = 0;
         const card = player.card;
@@ -191,7 +215,6 @@ document.addEventListener('DOMContentLoaded', () => {
         player.bingoCount = count;
     }
 
-    // ビンゴステータスメッセージを更新
     function updateBingoStatus(player) {
         const resultEl = document.getElementById(`result-${player.id}`);
         if (player.bingoCount > 0) {
@@ -201,7 +224,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // リセット処理
     resetButton.addEventListener('click', () => {
         gameScreen.classList.add('hidden');
         setupScreen.classList.remove('hidden');
@@ -209,4 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
         startGameButton.classList.add('hidden');
         playerCountInput.value = '1';
     });
+
+    // ★ 変更点 3: players-containerにクリックイベントを設定
+    playersContainer.addEventListener('click', handleCellClick);
 });
